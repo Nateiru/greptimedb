@@ -60,9 +60,6 @@ pub trait Request: Send + Sync + 'static {
 
 #[async_trait::async_trait]
 pub trait Handler: Send + Sync {
-    /// Returns the table as [`Any`](std::any::Any) so that it can be
-    /// downcast to a specific implementation.
-    fn as_any(&self) -> &dyn Any;
 
     async fn handle_request(
         &self,
@@ -282,7 +279,7 @@ impl HandlerLoop {
     #[inline]
     async fn put_back_req(&self, req: Box<dyn Request>) {
         let mut queue = self.req_queue.write().unwrap();
-        let _ = queue.push_front(req);
+        queue.push_front(req);
     }
 
     // Handles request, submit task to bg runtime.
@@ -370,15 +367,15 @@ mod tests {
         let handler_cloned = handler.clone();
         let _handle = common_runtime::spawn_bg(async move { handler_cloned.run().await });
 
-        let _ = queue
+        queue
             .write()
             .unwrap()
-            .push_back(Box::new(MockRequest::default()) as Box<dyn Request>);
+            .push_back(Box::<MockRequest>::default() as Box<dyn Request>);
         handler.task_notifier.notify_one();
-        let _ = queue
+        queue
             .write()
             .unwrap()
-            .push_back(Box::new(MockRequest::default()) as Box<dyn Request>);
+            .push_back(Box::<MockRequest>::default()  as Box<dyn Request>);
         handler.task_notifier.notify_one();
 
         tokio::time::timeout(Duration::from_secs(1), latch.wait())
@@ -400,10 +397,6 @@ mod tests {
     where
         F: Fn() + Send + Sync,
     {
-        fn as_any(&self) -> &dyn Any {
-            self
-        }
-
         async fn handle_request(
             &self,
             _req: Box<dyn Request>,
@@ -547,10 +540,6 @@ mod tests {
     where
         F: Fn() -> BoxFuture<'static, ()> + Send + Sync,
     {
-        fn as_any(&self) -> &dyn Any {
-            self
-        }
-
         async fn handle_request(
             &self,
             _req: Box<dyn Request>,

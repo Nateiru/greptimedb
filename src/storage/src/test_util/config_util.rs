@@ -99,7 +99,7 @@ pub async fn new_store_config_with_object_store(
 
     let compaction_scheduler = Arc::new(LocalScheduler::new(
         SchedulerConfig::default(),
-        CompactionHandler::default(),
+        Arc::<CompactionHandler<RaftEngineLogStore>>::new(CompactionHandler::default()) as _,
     ));
     // We use an empty region map so actually the background worker of the picker is disabled.
     let regions = Arc::new(RegionMap::new());
@@ -114,7 +114,7 @@ pub async fn new_store_config_with_object_store(
     );
     let file_purger = Arc::new(LocalScheduler::new(
         SchedulerConfig::default(),
-        NoopFilePurgeHandler,
+        Arc::new(NoopFilePurgeHandler) as _,
     ));
     (
         StoreConfig {

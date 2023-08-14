@@ -182,7 +182,7 @@ impl Version {
         let sst_layer = Arc::new(crate::test_util::access_layer_util::MockAccessLayer) as Arc<_>;
         let file_purger = Arc::new(crate::scheduler::LocalScheduler::new(
             crate::scheduler::SchedulerConfig::default(),
-            crate::file_purger::noop::NoopFilePurgeHandler,
+            Arc::new(crate::file_purger::noop::NoopFilePurgeHandler) as _,
         ));
         Version::with_manifest_version(metadata, 0, memtable, sst_layer, file_purger)
     }

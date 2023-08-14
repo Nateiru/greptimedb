@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use std::fmt::{Debug, Formatter};
-use std::marker::PhantomData;
 use std::any::Any;
 
 use store_api::storage::RegionId;
@@ -22,16 +21,8 @@ use crate::compaction::{CompactionTask, Picker};
 use crate::error::Result;
 use crate::scheduler::{Request, Scheduler, Key};
 
+#[derive(Default)]
 pub struct NoopCompactionScheduler {
-    _phantom_data: PhantomData<dyn Request>,
-}
-
-impl Default for NoopCompactionScheduler {
-    fn default() -> Self {
-        Self {
-            _phantom_data: Default::default(),
-        }
-    }
 }
 
 impl Debug for NoopCompactionScheduler {
@@ -83,7 +74,6 @@ impl Request for NoopCompactionRequest {
 
 #[async_trait::async_trait]
 impl Scheduler for NoopCompactionScheduler {
-
     fn schedule(&self, _request: Box<dyn Request>) -> Result<bool> {
         Ok(true)
     }

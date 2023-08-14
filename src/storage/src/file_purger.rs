@@ -50,9 +50,6 @@ pub struct FilePurgeHandler;
 
 #[async_trait::async_trait]
 impl Handler for FilePurgeHandler {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
 
     async fn handle_request(
         &self,
@@ -82,12 +79,11 @@ pub type FilePurgerRef = Arc<LocalScheduler>;
 #[cfg(test)]
 pub mod noop {
     use std::sync::Arc;
-    use std::any::Any;
 
     use tokio::sync::Notify;
 
     use crate::error::Result;
-    use crate::file_purger::{FilePurgeRequest, FilePurgerRef};
+    use crate::file_purger::FilePurgerRef;
     use crate::scheduler::rate_limit::{BoxedRateLimitToken, RateLimitToken};
     use crate::scheduler::{Handler, LocalScheduler, SchedulerConfig, Request};
 
@@ -103,9 +99,6 @@ pub mod noop {
 
     #[async_trait::async_trait]
     impl Handler for NoopFilePurgeHandler {
-        fn as_any(&self) -> &dyn Any {
-            self
-        }
 
         async fn handle_request(
             &self,

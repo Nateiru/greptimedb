@@ -124,9 +124,6 @@ impl<S> Handler for CompactionHandler<S>
 where
     S: LogStore,
 {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
 
     async fn handle_request(
         &self,

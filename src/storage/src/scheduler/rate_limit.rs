@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Arc;
 
@@ -48,7 +47,6 @@ pub type BoxedRateLimiter = Box<dyn RateLimiter + Send + Sync>;
 pub struct MaxInflightTaskLimiter {
     max_inflight_tasks: usize,
     inflight_tasks: Arc<AtomicUsize>,
-    _phantom_data: PhantomData<Box<dyn Request>>,
 }
 
 impl MaxInflightTaskLimiter {
@@ -56,13 +54,11 @@ impl MaxInflightTaskLimiter {
         Self {
             max_inflight_tasks,
             inflight_tasks: Arc::new(AtomicUsize::new(0)),
-            _phantom_data: Default::default(),
         }
     }
 }
 
 impl RateLimiter for MaxInflightTaskLimiter {
-
     fn acquire_token(&self, _: &Box<dyn Request>) -> Result<BoxedRateLimitToken> {
         if self.inflight_tasks.fetch_add(1, Ordering::Relaxed) >= self.max_inflight_tasks {
             let _ = self.inflight_tasks.fetch_sub(1, Ordering::Relaxed);
@@ -153,7 +149,7 @@ impl RateLimitToken for CompositeToken {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     // #[test]
     // fn test_max_inflight_limiter() {

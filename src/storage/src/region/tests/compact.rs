@@ -17,21 +17,19 @@
 use std::env;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
-use std::any::Any;
 
 use common_telemetry::logging;
 use common_test_util::temp_dir::create_temp_dir;
 use log_store::raft_engine::log_store::RaftEngineLogStore;
 use object_store::services::{Fs, S3};
 use object_store::ObjectStore;
-use store_api::logstore::LogStore;
 use store_api::storage::{FlushContext, FlushReason, OpenOptions, Region};
 use tokio::sync::{Notify, RwLock};
 
 use crate::compaction::CompactionHandler;
 use crate::config::EngineConfig;
 use crate::error::Result;
-use crate::file_purger::{FilePurgeHandler, FilePurgeRequest};
+use crate::file_purger::FilePurgeHandler;
 use crate::region::tests::{self, FileTesterBase};
 use crate::region::{CompactContext, FlushStrategyRef, RegionImpl};
 use crate::scheduler::rate_limit::BoxedRateLimitToken;
@@ -121,9 +119,6 @@ struct MockFilePurgeHandler {
 
 #[async_trait::async_trait]
 impl Handler for MockFilePurgeHandler {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
 
     async fn handle_request(
         &self,

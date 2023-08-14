@@ -284,9 +284,6 @@ struct FlushHandler<S: LogStore> {
 
 #[async_trait::async_trait]
 impl<S: LogStore> Handler for FlushHandler<S> {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
 
     async fn handle_request(
         &self,
@@ -358,7 +355,7 @@ async fn execute_flush_region<S: LogStore>(
         } else {
             // If flush is success, schedule a compaction request for this region.
             let _ =
-                region::schedule_compaction::<S>(shared_data, compaction_scheduler, Box::new(compaction_request) as Box<dyn Request>);
+                region::schedule_compaction(shared_data, compaction_scheduler, Box::new(compaction_request) as Box<dyn Request>);
         }
 
         // Complete the request.

@@ -917,7 +917,7 @@ impl WriterInner {
             let (sender, receiver) = oneshot::channel();
             compaction_request.sender = Some(sender);
 
-            if schedule_compaction::<S>(
+            if schedule_compaction(
                 request.shared_data,
                 compaction_scheduler,
                 Box::new(compaction_request) as Box<dyn Request>,
@@ -927,7 +927,7 @@ impl WriterInner {
                     .context(error::CompactTaskCancelSnafu { region_id })??;
             }
         } else {
-            let _ = schedule_compaction::<S>(
+            let _ = schedule_compaction(
                 request.shared_data,
                 compaction_scheduler,
                 Box::new(compaction_request) as Box<dyn Request>,
@@ -958,7 +958,7 @@ impl WriterInner {
 }
 
 /// Schedule compaction task, returns whether the task is scheduled.
-pub(crate) fn schedule_compaction<S: LogStore>(
+pub(crate) fn schedule_compaction(
     shared_data: SharedDataRef,
     compaction_scheduler: CompactionSchedulerRef,
     compaction_request: Box<dyn Request>,
